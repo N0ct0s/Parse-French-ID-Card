@@ -1,5 +1,5 @@
 # Parse-French-ID-Card
-You give a French ID Card image and it prints a Json object with all the informations.
+You give a French ID Card picture (scan, photo...). It reads the MRZ(Machine Readable Zone) and prints a Dictionnary with the informations of the card.
 # Compatibility
 This repository works with a new or old **French** ID Card (Carte Nationale d'Identité or CNI).
 # License
