@@ -29,30 +29,38 @@ def isNew(image, orb, flann):
   templateold = cv2.imread("template-old-cni.jpg")
   similarity_old = getSimilarity(kp_1, desc_1, templateold, orb,flann)
   print(similarity_old[0]*100)
+  templatebacknew = cv2.imread("template-new-back-cni.png")
+  similarity_backnew = getSimilarity(kp_1, desc_1, templatebacknew, orb,flann)
+  print(similarity_backnew[0]*100)
 
-  if(similarity_new[0]>3*similarity_old[0]):
-        print("br")
+  if(similarity_new[0]>3*similarity_old[0] and similarity_new[0]>2*similarity_backnew[0]):
         print("isNew runned during "+str(int(round(time.time() * 1000))-start))
-        return [True, similarity_new]
-  elif(similarity_old[0]>3*similarity_new[0]):
+        return ["new", similarity_new]
+  elif(similarity_old[0]>3*similarity_new[0] and similarity_old[0]>2*similarity_backnew[0]):
         print("isNew runned during "+str(int(round(time.time() * 1000))-start))
-        return [False, similarity_old]
+        return ["old", similarity_old]
+  elif(similarity_backnew[0]>2*similarity_new[0] and similarity_backnew[0]>3*similarity_old[0]):
+        print("isNew runned during "+str(int(round(time.time() * 1000))-start))
+        return ["new-back", similarity_backnew]
   else:
       return [None,None]
   
 def getCNI(tobealigned):
     starttime = int(round(time.time() * 1000))
     reference = None
-    orb_detector = cv2.ORB_create(6500)
+    orb_detector = cv2.ORB_create(6000)
     flann = cv2.FlannBasedMatcher(dict(algorithm = 6, table_number = 6,  key_size = 12,  multi_probe_level = 1), dict())
     isCNINew = isNew(tobealigned, orb_detector, flann)
     match(isCNINew[0]):
-        case True:
+        case "new":
             reference = cv2.imread("template-new-cni.jpg")
             print("new card")
-        case False:
+        case "old":
             reference = cv2.imread("template-old-cni.jpg")
             print("old card")
+        case "new-back":
+            reference = cv2.imread("template-new-back-cni.png")
+            print("back of new")
         case _:
             print("CARTE INVALIDE")
             exit()
@@ -64,6 +72,11 @@ def getCNI(tobealigned):
     dst_pts = numpy.float32([ kp2[m.trainIdx].pt for m in good_points]).reshape(-1,1,2)
     homography = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)[0]
     transformed_img = cv2.warpPerspective(tobealigned, homography, (width, height))
+    width = 1000
+    height = int(width*transformed_img.shape[0]/transformed_img.shape[1])
+    print(transformed_img.shape[1]/transformed_img.shape[0])
+    print(width/height)
+    transformed_img = cv2.resize(transformed_img, (width, height))
     #Your CNI is straightened !
     print("The program runned during "+str(int(round(time.time() * 1000))-starttime))
     return [transformed_img, isCNINew[0]]
