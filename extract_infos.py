@@ -1,3 +1,4 @@
+import numpy
 import extract_cni
 import time
 import pytesseract as pts
@@ -38,13 +39,12 @@ def checkKey(code, key):
 def analyzeCard(path):
     cni = extract_cni.getCNI(cv2.imread(path))
     pts.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    cni_thresh = cv2.threshold(cv2.cvtColor(cni[0], cv2.COLOR_RGB2GRAY), 100, 255, cv2.THRESH_BINARY)
-    cv2.imshow("ok", cni_thresh[1])
-    cv2.waitKey(0)
-    text = pts.image_to_string(Image.fromarray(cni_thresh[1]), lang="fra", config="--psm 6")
-    text = text.replace("\n", "").replace(" ", "")
+    cni_thresh = cv2.threshold(cv2.cvtColor(cni[0], cv2.COLOR_RGB2GRAY), 100, 255, cv2.THRESH_BINARY)[1]
     match(cni[1]):
         case "new-back":
+            text = pts.image_to_string(Image.fromarray(cni_thresh), lang="fra", config="--psm 6")
+            text = text.replace("\n", "").replace(" ", "")
+            print(text)
             bandeoptique = re.findall(r'IDFRA.{85}', text, re.IGNORECASE)
             if(bandeoptique != None and bandeoptique != []):
                 if(type(bandeoptique)!=str):
@@ -62,11 +62,10 @@ def analyzeCard(path):
                             sexe = informations[4] # Gender
                             nationalite = pycountry.countries.get(alpha_3=informations[7]) # Nationality
                             if(not(checkKey(informations[0], int(informations[1])) and checkKey(informations[2], int(informations[3])) and checkKey(informations[5], int(informations[6]))and checkKey(informations[0]+informations[1]+informations[2]+informations[3]+informations[5]+informations[6], int(informations[8])))):
-                                print("THIS CARD IS A FAKE CARD")
-                                return 1
+                                return "THIS CARD IS A FAKE CARD"
                                 
                             else: 
-                                print({
+                                return {
                                         "nom":nom,
                                         "prenoms":prenoms,
                                         "date de naissance":date_naissance,
@@ -74,14 +73,55 @@ def analyzeCard(path):
                                         "nationalite":nationalite.name,
                                         "sexe":sexe,
                                         "n°":informations[0]
-                                })
-                                return 0
+                                }
+                                
 
 
-            print("THIS CARD IS A FAKE CORD")
-            return 1
+            return "THIS CARD IS A FAKE CARD"
+        case "new":
+            #THIS OPTION IS NOT RECOMMENDED AND IS BASED ON OCR AND A VERY IMPERFECT TREATMENT
+            print("THIS OPTION IS NOT RECOMMENDED AND IS BASED ON OCR AND A VERY IMPERFECT TREATMENT")
+            results = pts.image_to_string(cni_thresh, lang='fra', config='--psm 12 -c tessedit_char_blacklist=‘—-!°').replace("‘", "").replace("—", "").replace("!", "").replace("\n", "!")
+            noms = re.findall(r"!!([A-ZÀ-Ü-]+)!!", results) # Last name
+            sexe = re.findall(r"!!(F|M)!!", results) # Gender
+            nationalite = re.findall(r"!!([A-Z]{3})!!", results) # Nationality
+            results = results.replace(" ", "")
+            dates = re.findall(r"!!([0-9]{8})!!", results)
+            numero = re.findall(r"!!([A-Z0-9]{9})!!", results) # Number
+            result = dict()
+            if(noms != []):
+                result['nom'] = noms[0]
+            if(numero != []):
+                result['n°'] = numero[0]
+            if(len(dates) == 2):
+                dates = [datetime.strptime(dates[0], "%d%m%Y"), datetime.strptime(dates[1], "%d%m%Y")]
+                date_naissance, date_expiration = sorted(dates, key=lambda x: x.timestamp())
+                result['date_naissance'], result['date_expiration'] = date_naissance.strftime("%d/%m/%Y"), date_expiration.strftime("%d/%m/%Y")            
+            if(noms != [] and sexe != [] and nationalite != [] and len(dates) == 2 and numero != []):
+                prenoms = re.findall(noms[0]+r".*!!((?:[A-ZÀ-Ü][a-zà-ü]+,)+[A-ZÀ-Ü][a-zà-ü]+)!!", results)
+                nationalite = pycountry.countries.get(alpha_3=nationalite[0])
+                if(prenoms != [] and nationalite != None):
+                    dates = [datetime.strptime(dates[0], "%d%m%Y"), datetime.strptime(dates[1], "%d%m%Y")]
+                    date_naissance, date_expiration = sorted(dates, key=lambda x: x.timestamp())
+                    date_naissance, date_expiration = date_naissance.strftime("%d/%m/%Y"), date_expiration.strftime("%d/%m/%Y")
+                    return {
+                        "nom":noms[0],
+                        "prenoms":prenoms[0],
+                        "sexe":sexe[0],
+                        "nationalite":nationalite.name,
+                        "date_naissance":date_naissance,
+                        "date_expiration":date_expiration,
+                        "n°":numero[0]
+                    }
+
+            print("TREATMENT FAILED THIS OPTION IS NOT RECOMMENDED")
+            return result
+            
             
         case "old":
+            text = pts.image_to_string(Image.fromarray(cni_thresh), lang="fra", config="--psm 6")
+            text = text.replace("\n", "").replace(" ", "")
+            print(text)
             bandeoptique = re.findall(r'IDFRA.{67}', text, re.IGNORECASE)
             if(bandeoptique != None and bandeoptique != []):
                 if(type(bandeoptique)!=str):
@@ -111,19 +151,18 @@ def analyzeCard(path):
                     nom = ' '.join(filter(None, informations[1].replace("<<C<", "<<<").rstrip("<").split("<")))
                     prenoms = ','.join(filter(None, informations[7].rstrip("<").split("<<"))).replace("<", "-")
                     if(not(checkKey(informations[2], int(informations[6])) and checkKey(informations[8], int(informations[9])) and checkKey(informations[0], int(informations[11])))):
-                        print("THIS CARD IS A FAKE CARD")
-                        return 1
+                        return "THIS CARD IS A FAKE CARD"
                         
                     else: 
-                        print({
+                        return {
                                 "nom":nom, #last name
                                 "prenoms":prenoms,#first names
                                 "date de naissance":date_naissance,#birthdate
                                 "departement":departement,#department
                                 "sexe":sexe,#gender
                                 "n°":informations[2]
-                        })
-                        return 0
+                        }
 starttime = int(round(time.time() * 1000))
-analyzeCard("test-new-back.png")
-print("The program runned during "+str(int(round(time.time() * 1000))-starttime))             
+print(analyzeCard(r"test-new-card.jpg"))
+
+print("The program runned during "+str(int(round(time.time() * 1000))-starttime))
