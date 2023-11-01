@@ -1,6 +1,6 @@
 ![Parse French ID Card](https://i.postimg.cc/T35jgMqj/download.png)
 <p align="left">
-  "Parse French ID Card" is an **open-source French Identity Card(CNI) parser**. You give a French ID Card picture (scan, photo...) using Tesseract OCR and OpenCV. It reads the MRZ(Machine Readable Zone) and prints a Dictionnary with the informations of the card.
+  "Parse French ID Card" is an <b>open-source French Identity Card(CNI) parser</b>. You give a French ID Card picture (scan, photo...) using Tesseract OCR and OpenCV. It reads the MRZ(Machine Readable Zone) and prints a Dictionnary with the informations of the card.
   The names of the variables are in French in extract-infos.py but you have a commentary with the translation. Else, the names of the variables are in English.
   You can fork the repository to adapt the code for every country using EU ID Card.
 </p>
