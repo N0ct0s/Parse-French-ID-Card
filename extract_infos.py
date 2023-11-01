@@ -18,7 +18,7 @@ def generateKey(code):
         elif "A" <= car <= "Z":
             valeur = ord(car)-55
         else:
-            print("Caractère hors bornes")
+            print("Caractère hors bornes / Character out of bounds")
             break
         resultat += valeur * facteur[position % 3]
     return (resultat % 10)
@@ -80,7 +80,7 @@ def analyzeCard(path):
             return "THIS CARD IS A FAKE CARD"
         case "new":
             #THIS OPTION IS NOT RECOMMENDED AND IS BASED ON OCR AND A VERY IMPERFECT TREATMENT
-            print("THIS OPTION IS NOT RECOMMENDED AND IS BASED ON OCR AND A VERY IMPERFECT TREATMENT")
+            print("THIS OPTION IS NOT RECOMMENDED AND IS A VERY IMPERFECT TREATMENT")
             results = pts.image_to_string(cni_thresh, lang='fra', config='--psm 12 -c tessedit_char_blacklist=‘—-!°').replace("‘", "").replace("—", "").replace("!", "").replace("\n", "!")
             noms = re.findall(r"!!([A-ZÀ-Ü-]+)!!", results) # Last name
             sexe = re.findall(r"!!(F|M)!!", results) # Gender
@@ -90,31 +90,24 @@ def analyzeCard(path):
             numero = re.findall(r"!!([A-Z0-9]{9})!!", results) # Number
             result = dict()
             if(noms != []):
-                result['nom'] = noms[0]
+                result['nom'] = noms[0] # Last name
+                prenoms = re.findall(noms[0]+r".*!!((?:[A-ZÀ-Ü][a-zà-ü]+,)+[A-ZÀ-Ü][a-zà-ü]+)!!", results)
+                if(prenoms != []):
+                    result['prenoms'] = prenoms[0] # First names
             if(numero != []):
-                result['n°'] = numero[0]
+                result['n°'] = numero[0] # Number
             if(len(dates) == 2):
                 dates = [datetime.strptime(dates[0], "%d%m%Y"), datetime.strptime(dates[1], "%d%m%Y")]
                 date_naissance, date_expiration = sorted(dates, key=lambda x: x.timestamp())
-                result['date_naissance'], result['date_expiration'] = date_naissance.strftime("%d/%m/%Y"), date_expiration.strftime("%d/%m/%Y")            
-            if(noms != [] and sexe != [] and nationalite != [] and len(dates) == 2 and numero != []):
-                prenoms = re.findall(noms[0]+r".*!!((?:[A-ZÀ-Ü][a-zà-ü]+,)+[A-ZÀ-Ü][a-zà-ü]+)!!", results)
+                result['date_naissance'], result['date_expiration'] = date_naissance.strftime("%d/%m/%Y"), date_expiration.strftime("%d/%m/%Y") # Birthdate, card expiry date
+            if(nationalite != []):
                 nationalite = pycountry.countries.get(alpha_3=nationalite[0])
-                if(prenoms != [] and nationalite != None):
-                    dates = [datetime.strptime(dates[0], "%d%m%Y"), datetime.strptime(dates[1], "%d%m%Y")]
-                    date_naissance, date_expiration = sorted(dates, key=lambda x: x.timestamp())
-                    date_naissance, date_expiration = date_naissance.strftime("%d/%m/%Y"), date_expiration.strftime("%d/%m/%Y")
-                    return {
-                        "nom":noms[0],
-                        "prenoms":prenoms[0],
-                        "sexe":sexe[0],
-                        "nationalite":nationalite.name,
-                        "date_naissance":date_naissance,
-                        "date_expiration":date_expiration,
-                        "n°":numero[0]
-                    }
+                if(nationalite != None):
+                    result['nationalite'] = nationalite.name # Nationality
+            if(sexe != []):
+                result['sexe'] = sexe[0] # Gender
 
-            print("TREATMENT FAILED THIS OPTION IS NOT RECOMMENDED")
+            print("LE RESULTAT PEUT ÊTRE INCOMPLET / THE RESULT MAY NOT BE COMPLETE")
             return result
             
             
@@ -164,5 +157,4 @@ def analyzeCard(path):
                         }
 starttime = int(round(time.time() * 1000))
 print(analyzeCard(r"test-new-card.jpg"))
-
 print("The program runned during "+str(int(round(time.time() * 1000))-starttime))
