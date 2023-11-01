@@ -3,13 +3,14 @@
   You give a French ID Card picture (scan, photo...) using Tesseract OCR and OpenCV. It reads the MRZ(Machine Readable Zone) and prints a Dictionnary with the informations of the card.
   The names of the variables are in French in extract-infos.py but you have a commentary with the translation. Else, the names of the variables are in English.
   You can fork the repository to adapt the code for every country using EU ID Card.
-  ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/N0ct0s/Parse-French-ID-Card)
-  ![Static Badge](https://img.shields.io/badge/language-python-blue)
-  ![GitHub](https://img.shields.io/github/license/N0ct0s/Parse-French-ID-Card)
-  ![GitHub repo size](https://img.shields.io/github/repo-size/N0ct0s/Parse-French-ID-Card)
-  ![GitHub Repo stars](https://img.shields.io/github/stars/N0ct0s/Parse-French-ID-Card)
-  ![Static Badge](https://img.shields.io/badge/dependencies-tesseract_ocr_%7C_opencv_%7C_pycountry-8A2BE2)
 </p>
+
+![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/N0ct0s/Parse-French-ID-Card)
+![Static Badge](https://img.shields.io/badge/language-python-blue)
+![GitHub](https://img.shields.io/github/license/N0ct0s/Parse-French-ID-Card)
+![GitHub repo size](https://img.shields.io/github/repo-size/N0ct0s/Parse-French-ID-Card)
+![GitHub Repo stars](https://img.shields.io/github/stars/N0ct0s/Parse-French-ID-Card)
+![Static Badge](https://img.shields.io/badge/dependencies-tesseract_ocr_%7C_opencv_%7C_pycountry-8A2BE2)
   
 # Compatibility
 This repository works with a new or old **French** ID Card (Carte Nationale d'Identité or CNI).
