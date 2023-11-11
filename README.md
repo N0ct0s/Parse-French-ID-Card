@@ -10,7 +10,7 @@
 ![GitHub](https://img.shields.io/github/license/N0ct0s/Parse-French-ID-Card)
 ![GitHub repo size](https://img.shields.io/github/repo-size/N0ct0s/Parse-French-ID-Card)
 ![GitHub Repo stars](https://img.shields.io/github/stars/N0ct0s/Parse-French-ID-Card)
-![Static Badge](https://img.shields.io/badge/dependencies-tesseract_ocr_%7C_opencv_%7C_pycountry-8A2BE2)
+![Static Badge](https://img.shields.io/badge/requirements-tesseract_ocr_%7C_opencv_%7C_pycountry-8A2BE2)
   
 # Compatibility
 This repository works with a new or old **French** ID Card (Carte Nationale d'Identité or CNI).
