@@ -12,10 +12,12 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/N0ct0s/Parse-French-ID-Card)
 ![Static Badge](https://img.shields.io/badge/requirements-tesseract_ocr_%7C_opencv_%7C_pycountry-8A2BE2)
 
+# Run
+At the bottom of extract-infos.py, you have an example and you can just change the path and run extract-infos.py
+
 # Compatibility
 This repository works with a new or old **French** ID Card (Carte Nationale d'Identité or CNI).
 You can provide as input the front of the old card or the back of the new card (Where you have the Machine Readable Zone/the long string beggining with "ID")
-To test the code, you provide the path of the image and you run the function analyzeCard(extract-infos.py). At the bottom of extract-infos.py, you have an example and you can just change the path and run extract-infos.py
 
 **IMPORTANT** : You can provide the front of the new card but processing will be very uncertain and may fail, as it is based solely on the full OCR of the image, and unwanted characters are often detected, disrupting processing.
 **So, providing the front of the new card is not recommended.**
