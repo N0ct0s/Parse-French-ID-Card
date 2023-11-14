@@ -15,13 +15,16 @@
 # Run
 At the bottom of extract-infos.py, you have an example and you can just change the path and run extract-infos.py
 
-# Compatibility
+# Compatibility with ID Cards
 This repository works with a new or old **French** ID Card (Carte Nationale d'Identité or CNI).
 You can provide as input the front of the old card or the back of the new card (Where you have the Machine Readable Zone/the long string beggining with "ID")
 
 **IMPORTANT** : You can provide the front of the new card but processing will be very uncertain and may fail, as it is based solely on the full OCR of the image, and unwanted characters are often detected, disrupting processing.
 **So, providing the front of the new card is not recommended.**
 
+# Compatibilty with OS
+If you are on Linux or Mac, you can remove the line with pytesseract_cmd(extract_infos.py)
+Else, if you are on Windows, please update the path given to pytesseract.pytesseract_cmd (Mine is C:\Program Files\Tesseract OCR\tesseract.exe)
 # Requirements
 To run the code, you need PIL, Tesseract OCR, OpenCV and PyCountry(available on pip).
 
